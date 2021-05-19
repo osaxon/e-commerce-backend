@@ -5,7 +5,6 @@ const { Category, Product } = require("../../models");
 
 router.get("/", async (req, res) => {
   // find all categories
-  // be sure to include its associated Products
   try {
     const catData = await Category.findAll({include: [{model: Product,}]});
     res.status(200).json(catData);
@@ -14,18 +13,39 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   // find one category by its `id` value
-  // be sure to include its associated Products
-  Category.findByPk(req.body, (req, res))
+  const id = req.params.id;
+  try {
+    const catData = await Category.findByPk(id, {include: [{model: Product}]})
+    res.status(200).json(catData);
+  } catch (err) {
+    res.status(500).json(err)
+  }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   // create a new category
+  const newCat = req.body;
+  try {
+    const catData = await Category.create(newCat);
+    res.status(200).json(catData)
+  } catch (err) {
+    res.status(400).json(err)
+  }
+
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // update a category by its `id` value
+  const catID = req.params.id;
+  const props = req.body;
+  try {
+    const catData = await Category.update(props, {where: { id: catID}})
+    res.status(200).json(catData)
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.delete("/:id", (req, res) => {
